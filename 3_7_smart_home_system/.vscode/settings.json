@@ -1,0 +1,11 @@
+{
+    "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
+    "idf.flashType": "UART",
+    "clangd.path": "C:\\Espressif\\tools\\esp-clangd\\esp-21.1.3_20260408\\esp-clangd\\bin\\clangd.exe",
+    "clangd.arguments": [
+      "--background-index",
+      "--query-driver=**",
+      "--compile-commands-dir=d:\\ESP_IFD_VS\\EMB_hw\\3_7_smart_home_system/build/default"
+    ],
+    "cmake.sourceDirectory": "D:/ESP_IFD_VS/EMB_hw/3_7_smart_home_system/esp32s3_tg_bot"
+}
