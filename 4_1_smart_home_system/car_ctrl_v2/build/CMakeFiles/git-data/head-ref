@@ -1,0 +1,14 @@
+0000000000000000000000000000000000000000 779a4b20b0f537a6fd637950118de8f91c57c440 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718014 +0300	commit (initial): Add ESP32-S3 button debounce homework (ESP-IDF)
+779a4b20b0f537a6fd637950118de8f91c57c440 c224df7f418ff82b47a3b304b2d440a23de40ca8 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718147 +0300	commit: Security fix: remove tracked config and IDE files
+c224df7f418ff82b47a3b304b2d440a23de40ca8 6092fc89e49b4c5d8dedd891a871c1625a405c74 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718544 +0300	commit (merge): Implement ESP32-S3 button debounce task with strict gitignore rules
+6092fc89e49b4c5d8dedd891a871c1625a405c74 6092fc89e49b4c5d8dedd891a871c1625a405c74 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718649 +0300	Branch: renamed refs/heads/main to refs/heads/main
+6092fc89e49b4c5d8dedd891a871c1625a405c74 4029ed5eec6e8dd524fa9f2c4cdcdbb2512d46ea Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718668 +0300	commit: Clean ESP32-S3 button debounce homework
+4029ed5eec6e8dd524fa9f2c4cdcdbb2512d46ea 508d890d55380f83e54dff5051ff9f6243125c78 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788718984 +0300	commit: Move all project files into 2_4 folder
+508d890d55380f83e54dff5051ff9f6243125c78 146bd0075b3c924829016c2788fe616da172c507 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788802328 +0300	commit: Initial clean upload of EMB_hw-2_4 project
+146bd0075b3c924829016c2788fe616da172c507 146bd0075b3c924829016c2788fe616da172c507 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1788802329 +0300	Branch: renamed refs/heads/main to refs/heads/main
+146bd0075b3c924829016c2788fe616da172c507 c8d46868a69ff71b78a2c8b53f5b20b8839a7462 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790167545 +0300	commit: Add 3_2 folder
+c8d46868a69ff71b78a2c8b53f5b20b8839a7462 4d6937025bb92af7f871138cce0c2d3460209b9d Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790256051 +0300	commit (merge): Update project structure and folder name
+4d6937025bb92af7f871138cce0c2d3460209b9d cf411057fca140f2e6bf80cae7269bda88e25ab7 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790357828 +0300	commit: Оновлення файлів проєкту
+cf411057fca140f2e6bf80cae7269bda88e25ab7 3c5e5e09c21eac7d8b51463fece778e42a7e8945 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790511279 +0300	commit: Add new hardware projects
+3c5e5e09c21eac7d8b51463fece778e42a7e8945 aa6a4978107eec9e66a1553ae6babc8a1a418fe4 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790595809 +0300	commit: Додано нові проекти
+aa6a4978107eec9e66a1553ae6babc8a1a418fe4 4eaf6ea87404e31cb8799e072d96d8b44a8b41b8 Maksym Pravoslavnyi <malexxbtc@gmail.com> 1790861398 +0300	commit: Add smart home system

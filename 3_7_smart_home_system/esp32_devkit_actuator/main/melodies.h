@@ -1,8 +1,6 @@
 #ifndef MELODIES_H
 #define MELODIES_H
 
-#include <stdint.h>
-
 typedef struct {
     int frequency;
     int duration_ms;
@@ -14,6 +12,7 @@ typedef struct {
     int length;
 } Melody;
 
-extern const Melody classic_playlist[4];
+#define PLAYLIST_SIZE 5
+extern const Melody custom_playlist[PLAYLIST_SIZE];
 
 #endif // MELODIES_H

@@ -1,0 +1,10 @@
+# Плата ESP32-S3 з флешем 16 MB
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+
+# 1 кГц тик: vTaskDelay(pdMS_TO_TICKS(2)) дає точні 2 мс між півкроками кермо
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
+
+# Один MOSFET (IRL540N), без реверсу: IN1/IN2 не використовуються.
+# Для L298N з реверсом приберіть рядок нижче.
+# CONFIG_CAR_MOTOR_REVERSE is not set

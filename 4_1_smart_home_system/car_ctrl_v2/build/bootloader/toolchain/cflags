@@ -1,0 +1,5 @@
+"-specs=D:/ESP_IFD_VS/EMB_hw/4_1_smart_home_system/car_ctrl_v2/build/bootloader/specs/picolibc.specs"
+-mlongcalls
+-fno-builtin-memcpy
+-fno-builtin-memset
+-fno-builtin-bzero

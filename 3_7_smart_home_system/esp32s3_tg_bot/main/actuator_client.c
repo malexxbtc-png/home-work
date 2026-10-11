@@ -98,3 +98,10 @@ esp_err_t actuator_play_sound(int melody_id) {
     snprintf(path, sizeof(path), "/play_sound?id=%d", melody_id);
     return send_simple_get(path);
 }
+
+// Додано функцію майстер-вимикача
+esp_err_t actuator_master_switch(int level) {
+    char path[64];
+    snprintf(path, sizeof(path), "/master_switch?level=%d", level);
+    return send_simple_get(path);
+}

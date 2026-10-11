@@ -1,10 +1,11 @@
 #include "leds.h"
 #include "driver/ledc.h"
 
-#define LED_COUNT 6
-static const int led_gpios[LED_COUNT] = {17, 18, 19, 21, 22, 23};
+#define LED_COUNT 3
+static const int led_gpios[LED_COUNT] = {21, 22, 23};
 static uint8_t led_levels[LED_COUNT] = {0};
 static const uint32_t duty_map[5] = {0, 2048, 4096, 6144, 8191};
+
 
 void leds_init(void) {
     ledc_timer_config_t timer = {
@@ -36,6 +37,12 @@ void led_set_level(uint8_t led_index, uint8_t level) {
     
     ledc_set_duty(LEDC_LOW_SPEED_MODE, (ledc_channel_t)led_index, duty_map[level]);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, (ledc_channel_t)led_index);
+}
+
+void leds_set_all(uint8_t level) {
+    for (int i = 0; i < LED_COUNT; i++) {
+        led_set_level(i, level);
+    }
 }
 
 uint8_t led_get_level(uint8_t led_index) {

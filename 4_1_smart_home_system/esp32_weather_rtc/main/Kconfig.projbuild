@@ -1,0 +1,73 @@
+                                                                                menu "Weather station"
+
+    config WS_WIFI_ENABLE
+        bool "Увімкнути WiFi + NTP (підстроювання RTC раз на годину)"
+        default y
+        help
+            Годинник іде від DS1307 і без WiFi. З WiFi RTC додатково
+            синхронізується з інтернетом.
+
+    config WS_WIFI_SSID
+        string "SSID WiFi мережі"
+        default "your ssid"
+
+    config WS_WIFI_PASSWORD
+        string "Пароль WiFi мережі"
+        default "your password"
+
+    config WS_TIMEZONE
+        string "POSIX timezone"
+        default "EET-2EEST,M3.5.0/3,M10.5.0/4"
+        help
+            Київ: EET-2EEST,M3.5.0/3,M10.5.0/4 (автоматичний літній/зимовий час)
+
+    config WS_I2C_SDA
+        int "I2C SDA GPIO"
+        default 21
+
+    config WS_I2C_SCL
+        int "I2C SCL GPIO"
+        default 22
+
+    config WS_RTC_ADDR
+        hex "DS1307 I2C address"
+        default 0x68
+
+    config WS_RTC_SET_FROM_BUILD
+        bool "Примусово записати в RTC час збірки (одноразово)"
+        default n
+        help
+            Звичайно RTC виставляється сам: від NTP або (якщо RTC ще не заведений) часом збірки.
+            Увімкни, прошийся один раз, потім ВИМКНИ і прошийся знову.
+
+    config WS_OLED_ADDR
+        hex "OLED I2C address"
+        default 0x3C
+        help
+            0x3C або 0x3D
+
+    config WS_SENSOR_ADDR
+        hex "BMP280/BME280 I2C address"
+        default 0x76
+        help
+            0x76 або 0x77. Якщо датчик не знайдено, код сам спробує другу адресу.
+
+    config WS_UART_TX
+        int "UART2 TX GPIO (до RX на ESP32-S3)"
+        default 17
+
+    config WS_UART_RX
+        int "UART2 RX GPIO"
+        default 16
+
+    config WS_UART_BAUD
+        int "UART baud rate"
+        default 115200
+
+    config WS_SHORT_SCREEN_MS
+        int "Тривалість екранів температури/вологості/тиску, мс"
+        default 3000
+        help
+            Екран часу показується в 4 рази довше.
+
+endmenu

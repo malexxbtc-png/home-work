@@ -1,5 +1,5 @@
 {
-  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.intelliSenseEngine": "disabled",
   "idf.extensionActivationMode": "always",
   "cmake.configureOnOpen": true,
   "cmake.configureOnEdit": false,

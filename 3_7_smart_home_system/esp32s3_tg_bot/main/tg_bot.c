@@ -1,14 +1,14 @@
 #include "tg_bot.h"
 #include "tg_config.h"
 #include "actuator_client.h"
-
 #include "esp_http_client.h"
 #include "esp_crt_bundle.h"
 #include "esp_log.h"
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
+#include "clock_uart.h"
+#include "esp_sntp.h"
 #include "string.h"
 #include "stdlib.h"
 #include "stdio.h"
@@ -17,7 +17,6 @@
 static const char *TAG = "TG_BOT";
 static int64_t last_update_id = 0;
 
-// Динамічний список дозволених користувачів
 #define MAX_ALLOWED_USERS 10
 static int64_t allowed_users[MAX_ALLOWED_USERS] = {ADMIN_CHAT_ID};
 static size_t allowed_users_count = 1;
@@ -62,6 +61,74 @@ static esp_err_t _http_response_event_handler(esp_http_client_event_t *evt) {
     return ESP_OK;
 }
 
+void time_sync_init(void) {
+    ESP_LOGI(TAG, "Initializing SNTP time sync...");
+    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_init();
+    setenv("TZ", "EET-2EEST,M3.5.0/3,M10.5.0/4", 1);
+    tzset();
+}
+
+static void scheduler_task(void *pvParameters) {
+    (void)pvParameters;
+    int last_active_state = -1; 
+    time_t last_sync = 0;
+    bool clock_synced_after_boot = false;
+
+    while (1) {
+        time_t now;
+        struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        // Перевіряємо чи час синхронізовано з інтернету (> 2020 року)
+        if (timeinfo.tm_year > (2020 - 1900)) {
+            
+            // 1. Миттєва синхронізація годинника одразу після появи точного часу в інтернеті
+            if (!clock_synced_after_boot) {
+                vTaskDelay(pdMS_TO_TICKS(2000)); // невелика пауза на стабілізацію
+                time(&now);
+                localtime_r(&now, &timeinfo);
+                clock_sync_time(&timeinfo);
+                clock_synced_after_boot = true;
+                last_sync = now;
+                ESP_LOGI(TAG, "[UART CLOCK] Початкову синхронізацію часу з годинником виконано успішно (%02d:%02d:%02d)", 
+                         timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+            }
+
+            int current_min = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+            
+            // Автоматичний розклад освітлення
+            bool is_schedule_active = (current_min >= 5 * 60 && current_min < 7 * 60) ||
+                                      (current_min >= 18 * 60 && current_min < 23 * 60);
+
+            if ((int)is_schedule_active != last_active_state) {
+                last_active_state = is_schedule_active;
+                if (is_schedule_active) {
+                    actuator_set_led(1, 4);
+                    actuator_set_led(2, 4);
+                    actuator_set_angle(90);
+                    ESP_LOGI(TAG, "[SCHEDULE] Увімкнено вечірній/ранковий режим");
+                } else {
+                    actuator_set_led(1, 0);
+                    actuator_set_led(2, 0);
+                    actuator_set_angle(0);
+                    ESP_LOGI(TAG, "[SCHEDULE] Вимкнено. Режим очікування");
+                }
+            }
+
+            // 2. Періодична синхронізація часу з годинником через UART щогодини
+            if (now - last_sync > 3600) {
+                clock_sync_time(&timeinfo);
+                last_sync = now;
+                ESP_LOGI(TAG, "[UART CLOCK] Періодична синхронізація часу з годинником виконана");
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(5000)); // перевірка кожні 5 секунд
+    }
+}
+
 static void send_tg_message(int64_t chat_id, const char* text, const char* reply_markup) {
     char url[256];
     snprintf(url, sizeof(url), "https://api.telegram.org/bot%s/sendMessage", TG_BOT_TOKEN);
@@ -71,7 +138,7 @@ static void send_tg_message(int64_t chat_id, const char* text, const char* reply
 
     cJSON_AddNumberToObject(root, "chat_id", (double)chat_id);
     cJSON_AddStringToObject(root, "text", text);
-    cJSON_AddStringToObject(root, "parse_mode", "HTML");
+    cJSON_AddStringToObject(root, "parse_mode", "Markdown");
 
     if (reply_markup) {
         cJSON *markup = cJSON_Parse(reply_markup);
@@ -109,11 +176,19 @@ static void send_main_menu(int64_t chat_id) {
     char status_raw[128] = {0};
     esp_err_t err = actuator_get_status(status_raw, sizeof(status_raw));
 
-    char text[256];
+    char text[512];
     char markup[1024];
 
-    int l[6] = {0};
+    int l[3] = {0};
     int deg = 0;
+    
+    clock_sensors_t sensors;
+    bool has_sensors = clock_get_sensors(&sensors);
+    char sensor_str[128] = "";
+    if (has_sensors) {
+        snprintf(sensor_str, sizeof(sensor_str), "\n• Температура: 🌡 **%.1f°C**\n• Вологість: 💧 **%.1f%%**", 
+                 sensors.temperature, sensors.humidity);
+    }
 
     if (err == ESP_OK) {
         cJSON *root = cJSON_Parse(status_raw);
@@ -122,7 +197,7 @@ static void send_main_menu(int64_t chat_id) {
             cJSON *angle = cJSON_GetObjectItem(root, "angle");
 
             if (leds && cJSON_IsArray(leds)) {
-                for (int i = 0; i < 6 && i < cJSON_GetArraySize(leds); i++) {
+                for (int i = 0; i < 3 && i < cJSON_GetArraySize(leds); i++) {
                     cJSON *item = cJSON_GetArrayItem(leds, i);
                     if (item && cJSON_IsNumber(item)) {
                         l[i] = item->valueint;
@@ -136,29 +211,24 @@ static void send_main_menu(int64_t chat_id) {
 
             snprintf(text, sizeof(text),
                 "🏠 **Панель Розумного Будинку**\n"
-                "• Статус: 🟢 **Онлайн**\n"
-                "• Кут серво: **%d°**", deg);
-        } else {
-            snprintf(text, sizeof(text), "🏠 **Панель Розумного Будинку**\n• Статус: 🟢 Онлайн");
+                "• Статус актуатора: 🟢 **Онлайн**\n"
+                "• Кут серво: **%d°**%s", deg, sensor_str);
         }
     } else {
-        snprintf(text, sizeof(text), "🏠 **Панель Розумного Будинку**\n• Статус: 🔴 **Офлайн**");
+        snprintf(text, sizeof(text), "🏠 **Панель Розумного Будинку**\n• Статус актуатора: 🔴 **Офлайн**%s", sensor_str);
     }
 
-    // Динамічне формування кнопок з індикаторами освітлення
+    // Клавіатура з 3 світлодіодами, майстер-вимикачами, серво та мелодіями
     snprintf(markup, sizeof(markup),
         "{\"inline_keyboard\":["
-        "[{\"text\":\"Кімн. 1 %s\",\"callback_data\":\"led_1\"},{\"text\":\"Кімн. 2 %s\",\"callback_data\":\"led_2\"}],"
-        "[{\"text\":\"Кімн. 3 %s\",\"callback_data\":\"led_3\"},{\"text\":\"Кімн. 4 %s\",\"callback_data\":\"led_4\"}],"
-        "[{\"text\":\"Кімн. 5 %s\",\"callback_data\":\"led_5\"},{\"text\":\"Кімн. 6 %s\",\"callback_data\":\"led_6\"}],"
+        "[{\"text\":\"LED 1 %s\",\"callback_data\":\"led_1\"},{\"text\":\"LED 2 %s\",\"callback_data\":\"led_2\"},{\"text\":\"LED 3 %s\",\"callback_data\":\"led_3\"}],"
+        "[{\"text\":\"💡 Усі вимк.\",\"callback_data\":\"master_0\"},{\"text\":\"💡 Усі увімк.\",\"callback_data\":\"master_4\"}],"
         "[{\"text\":\"📐 0°\",\"callback_data\":\"ang_0\"},{\"text\":\"📐 90°\",\"callback_data\":\"ang_90\"},{\"text\":\"📐 180°\",\"callback_data\":\"ang_180\"}],"
-        "[{\"text\":\"🎵 Мел. 1\",\"callback_data\":\"play_1\"},{\"text\":\"🎵 Мел. 2\",\"callback_data\":\"play_2\"},"
-        "{\"text\":\"🎵 Мел. 3\",\"callback_data\":\"play_3\"},{\"text\":\"🎵 Мел. 4\",\"callback_data\":\"play_4\"}],"
-        "[{\"text\":\"🔇 Стоп\",\"callback_data\":\"play_0\"}]"
+        "[{\"text\":\"🎵 Гімн\",\"callback_data\":\"play_1\"},{\"text\":\"🎵 Підманула\",\"callback_data\":\"play_2\"}],"
+        "[{\"text\":\"🎵 Eminem\",\"callback_data\":\"play_3\"},{\"text\":\"🎵 Morricone\",\"callback_data\":\"play_4\"}],"
+        "[{\"text\":\"🎵 Pirates\",\"callback_data\":\"play_5\"},{\"text\":\"🔇 Стоп\",\"callback_data\":\"play_0\"}]"
         "]}",
-        l[0] ? "🟢" : "⚪", l[1] ? "🟢" : "⚪",
-        l[2] ? "🟢" : "⚪", l[3] ? "🟢" : "⚪",
-        l[4] ? "🟢" : "⚪", l[5] ? "🟢" : "⚪"
+        l[0] ? "🟢" : "⚪", l[1] ? "🟢" : "⚪", l[2] ? "🟢" : "⚪"
     );
 
     send_tg_message(chat_id, text, markup);
@@ -185,17 +255,14 @@ static void process_update(cJSON *update) {
                         send_main_menu(chat_id);
                     }
                 } else {
-                    // 1. Сповіщаємо користувача про запит
                     send_tg_message(chat_id, "🔒 Доступ обмежено. Запит на авторизацію відправлено адміністратору.", NULL);
 
-                    // 2. Збираємо дані невідомого користувача
                     cJSON *first_name = cJSON_GetObjectItem(chat, "first_name");
                     cJSON *username = cJSON_GetObjectItem(chat, "username");
 
                     const char *f_name = (first_name && cJSON_IsString(first_name)) ? first_name->valuestring : "Невідомо";
                     const char *u_name = (username && cJSON_IsString(username)) ? username->valuestring : "Немає";
 
-                    // 3. Формуємо сповіщення для адміна
                     char admin_msg[256];
                     snprintf(admin_msg, sizeof(admin_msg),
                              "⚠️ **Новий запит на доступ!**\n\n"
@@ -204,7 +271,6 @@ static void process_update(cJSON *update) {
                              "Username: @%s",
                              chat_id, f_name, u_name);
 
-                    // 4. Формуємо inline-кнопку для надання доступу
                     char admin_markup[128];
                     snprintf(admin_markup, sizeof(admin_markup),
                              "{\"inline_keyboard\":[[{\"text\":\"✅ Надати доступ\",\"callback_data\":\"allow_%lld\"}]]}",
@@ -229,25 +295,29 @@ static void process_update(cJSON *update) {
 
                 if (is_user_allowed(chat_id)) {
                     if (strncmp(cb_data, "led_", 4) == 0) {
-                        int id = atoi(cb_data + 4);
-                        
+                        int led_id = atoi(cb_data + 4);
+                        if (led_id < 1 || led_id > 3) {
+                            return;
+                        }
                         char status_raw[128] = {0};
-                        int current_lvl = 0;
+                        int current_val = 0;
                         if (actuator_get_status(status_raw, sizeof(status_raw)) == ESP_OK) {
                             cJSON *st = cJSON_Parse(status_raw);
                             if (st) {
                                 cJSON *leds = cJSON_GetObjectItem(st, "leds");
-                                if (leds && cJSON_IsArray(leds) && (id - 1) < cJSON_GetArraySize(leds)) {
-                                    cJSON *elem = cJSON_GetArrayItem(leds, id - 1);
-                                    if (elem && cJSON_IsNumber(elem)) {
-                                        current_lvl = elem->valueint;
-                                    }
+                                if (leds && cJSON_IsArray(leds) && (led_id - 1) < cJSON_GetArraySize(leds)) {
+                                    cJSON *item = cJSON_GetArrayItem(leds, led_id - 1);
+                                    if (item && cJSON_IsNumber(item)) current_val = item->valueint;
                                 }
                                 cJSON_Delete(st);
                             }
                         }
-                        int next_lvl = (current_lvl > 0) ? 0 : 4;
-                        actuator_set_led(id, next_lvl);
+                        int new_val = (current_val > 0) ? 0 : 4;
+                        actuator_set_led(led_id, new_val);
+                        send_main_menu(chat_id);
+                    } else if (strncmp(cb_data, "master_", 7) == 0) {
+                        int level = atoi(cb_data + 7);
+                        actuator_master_switch(level); // Обробка майстер-вимикача
                         send_main_menu(chat_id);
                     } else if (strncmp(cb_data, "ang_", 4) == 0) {
                         int deg = atoi(cb_data + 4);
@@ -255,14 +325,16 @@ static void process_update(cJSON *update) {
                         send_main_menu(chat_id);
                     } else if (strncmp(cb_data, "play_", 5) == 0) {
                         int m_id = atoi(cb_data + 5);
-                        actuator_play_sound(m_id);
+                        actuator_play_sound(m_id); 
                         send_main_menu(chat_id);
                     } else if (strncmp(cb_data, "allow_", 6) == 0 && chat_id == ADMIN_CHAT_ID) {
                         int64_t new_user_id = atoll(cb_data + 6);
                         if (add_allowed_user(new_user_id)) {
-                            // Сповіщаємо адміна та нового користувача
-                            send_tg_message(ADMIN_CHAT_ID, "✅ Користувача успішно додано до списку дозволених.", NULL);
-                            send_tg_message(new_user_id, "🎉 **Вітаємо!** Адміністратор надав вам доступ.\nНапишіть /menu для відкриття панелі.", NULL);
+                            send_tg_message(ADMIN_CHAT_ID, "✅ Користувача успішно додано!", NULL);
+                            send_tg_message(new_user_id, "🎉 Вам надано доступ до управління!", NULL);
+                            send_main_menu(new_user_id);
+                        } else {
+                            send_tg_message(ADMIN_CHAT_ID, "❌ Список дозволених користувачів заповнений.", NULL);
                         }
                     }
                 }
@@ -334,6 +406,8 @@ static void tg_polling_task(void *pvParameters) {
 }
 
 void tg_bot_start(void) {
+    time_sync_init();
+    xTaskCreate(scheduler_task, "scheduler_task", 3072, NULL, 5, NULL);
     if (xTaskCreate(tg_polling_task, "tg_polling_task", 10240, NULL, 5, NULL) != pdPASS) {
         ESP_LOGE(TAG, "Failed to create Telegram polling task");
     }

@@ -10,6 +10,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_err.h"
+#include "esp_sntp.h"
 #include "lwip/ip4_addr.h"
 
 #include "leds.h"
@@ -17,8 +18,8 @@
 #include "buzzer.h"
 #include "web_server.h"
 
-#define WIFI_SSID "ваш_мережевий_ідентифікатор"  // <-- Змініть на ваш SSID
-#define WIFI_PASS "ваш_пароль"  // <-- Змініть на ваш пароль
+#define WIFI_SSID "wi-fi"  // <-- Змініть на ваш SSID
+#define WIFI_PASS "11111"  // <-- Змініть на ваш пароль
 
 static const char *TAG = "MAIN_ACTUATOR";
 static EventGroupHandle_t wifi_event_group;
@@ -47,8 +48,8 @@ static void wifi_init_sta(void) {
     esp_netif_dhcpc_stop(netif);
 
     esp_netif_ip_info_t ip_info = {0};
-    IP4_ADDR(&ip_info.ip, 192, 168, 0, 200);   // <-- Змінено підмережу на 0, а IP на 200
-    IP4_ADDR(&ip_info.gw, 192, 168, 0, 1);     // <-- Змінено шлюз на 192.168.0.1
+    IP4_ADDR(&ip_info.ip, 192, 168, 0, 200);   // IP: 192.168.0.200
+    IP4_ADDR(&ip_info.gw, 192, 168, 0, 1);     // Шлюз: 192.168.0.1
     IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0);
     esp_netif_set_ip_info(netif, &ip_info);
     
@@ -74,6 +75,42 @@ static void wifi_init_sta(void) {
     ESP_LOGI(TAG, "Connecting to WiFi %s...", WIFI_SSID);
 }
 
+static void sntp_init_kyiv(void) {
+    ESP_LOGI(TAG, "Initializing SNTP (Kyiv Time)...");
+    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_init();
+
+    // Часовий пояс для України з урахуванням літнього/зимового часу
+    setenv("TZ", "EET-2EEST,M3.5.0/3,M10.5.0/4", 1);
+    tzset();
+}
+
+static void daily_alarm_task(void *pvParameters) {
+    bool played_today = false;
+
+    while (1) {
+        time_t now;
+        struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        // Перевіряємо чи наступила 09:00 ранку
+        if (timeinfo.tm_hour == 9 && timeinfo.tm_min == 0) {
+            if (!played_today) {
+                ESP_LOGI(TAG, "09:00 AM! Playing Anthem for 60 seconds...");
+                buzzer_play_melody_loop_async(1, 60); // Мелодія 1 (Гімн), зациклити на 60 сек
+                played_today = true;
+            }
+        } else {
+            // Скидаємо прапорець в інші хвилини, щоб спрацювало завтра
+            played_today = false;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Перевірка кожну секунду
+    }
+}
+
 void app_main(void) {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -88,8 +125,14 @@ void app_main(void) {
 
     wifi_init_sta();
 
-    // Чекаємо успішного підключення до Wi-Fi та отримання IP перед запуском HTTP-сервера
+    // Чекаємо успішного підключення до Wi-Fi
     xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
     
+    // Синхронізуємо точний час
+    sntp_init_kyiv();
+
+    // Запускаємо фоновий будильник
+    xTaskCreate(daily_alarm_task, "daily_alarm_task", 3072, NULL, 5, NULL);
+
     start_web_server();
 }

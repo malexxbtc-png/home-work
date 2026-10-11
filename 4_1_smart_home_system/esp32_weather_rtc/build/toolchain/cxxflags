@@ -1,0 +1,7 @@
+-Wno-frame-address
+-mlongcalls
+-fno-builtin-memcpy
+-fno-builtin-memset
+-fno-builtin-bzero
+"-specs=D:/ESP_IFD_VS/EMB_hw/4_1_smart_home_system/esp32_weather_rtc/build/specs/picolibc.specs"
+-fno-rtti

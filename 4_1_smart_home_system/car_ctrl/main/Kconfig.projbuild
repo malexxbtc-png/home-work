@@ -1,0 +1,151 @@
+menu "Car control"
+
+    menu "Pins (ESP32-S3)"
+        config CAR_L298_ENA_GPIO
+            int "L298N ENA (PWM)"
+            default 4
+        config CAR_L298_IN1_GPIO
+            int "L298N IN1"
+            default 5
+        config CAR_L298_IN2_GPIO
+            int "L298N IN2"
+            default 6
+        config CAR_MOTOR_REVERSE
+            bool "Реверс мотора: L298N (IN1/IN2). Вимкніть для одного MOSFET (тільки вперед)"
+            default y
+        config CAR_STEER_IN1_GPIO
+            int "ULN2003 IN1"
+            default 7
+        config CAR_STEER_IN2_GPIO
+            int "ULN2003 IN2"
+            default 8
+        config CAR_STEER_IN3_GPIO
+            int "ULN2003 IN3"
+            default 9
+        config CAR_STEER_IN4_GPIO
+            int "ULN2003 IN4"
+            default 10
+        config CAR_MAX_MOSI_GPIO
+            int "MAX7219 DIN (MOSI)"
+            default 13
+        config CAR_MAX_CLK_GPIO
+            int "MAX7219 CLK"
+            default 14
+        config CAR_MAX_CS_GPIO
+            int "MAX7219 CS"
+            default 15
+        config CAR_UART_TX_GPIO
+            int "Телеметрія: TX GPIO (не використовується)"
+            default 16
+        config CAR_UART_RX_GPIO
+            int "Телеметрія: RX GPIO (до TX погодної станції)"
+            default 17
+    endmenu
+
+    menu "Drive motor"
+        config CAR_PWM_FREQ_HZ
+            int "PWM частота L298N, Гц"
+            default 20000
+        config CAR_MOTOR_MIN_DUTY_PCT
+            int "Мінімальна шпаруватість старту, %"
+            range 0 99
+            default 30
+            help
+                Мотор не стартує на малій напрузі. Ненульова тяга 1..100 мапиться на
+                діапазон від цього значення до CAR_MOTOR_MAX_DUTY_PCT. Підберіть тестом.
+        config CAR_MOTOR_MAX_DUTY_PCT
+            int "Максимальна шпаруватість (повна тяга), %"
+            range 1 100
+            default 60
+            help
+                Обмежує напругу на моторі. Вихід L298N приблизно VS·шпаруватість − 2 В.
+                Для мотора 5 В і VS 12 В: 60 % дає ~5 В. Для VS 6 В ставте 100.
+    endmenu
+
+    menu "Steering (28BYJ-48)"
+        config CAR_STEER_HALFSTEPS_PER_REV
+            int "Half-steps на оберт вихідного валу"
+            default 4096
+            help
+                28BYJ-48 з редуктором 1:64 у half-step режимі = 4096 (номінал).
+                Реальне передатне відношення ~1:63.68, тож для точного кута
+                підберіть значення тестом (часто ~4076).
+        config CAR_STEER_MAX_DEG
+            int "Максимальний кут керма, градуси (360 = повний оберт у кожен бік)"
+            range 1 360
+            default 360
+        config CAR_STEER_VECTOR_MIN_PCT
+            int "Мінімальна довжина вектора стіка для керма, %"
+            range 0 100
+            default 40
+        config CAR_STEER_STEP_DELAY_MS
+            int "Пауза між півкроками, мс"
+            range 1 20
+            default 2
+        config CAR_STEER_INVERT
+            bool "Інвертувати напрямок керма (якщо крутить навпаки)"
+            default n
+    endmenu
+
+    menu "UART"
+        config CAR_UART_PORT
+            int "Телеметрія (погодна станція): UART номер"
+            default 1
+        config CAR_UART_BAUD
+            int "Телеметрія: швидкість, бод"
+            default 115200
+        config CAR_CMD_UART_PORT
+            int "Команди (ESP32 DevKit): UART номер"
+            default 2
+        config CAR_CMD_UART_RX_GPIO
+            int "Команди: RX GPIO (до TX DevKit)"
+            default 21
+        config CAR_CMD_UART_TX_GPIO
+            int "Команди: TX GPIO (-1 = не потрібен)"
+            default -1
+        config CAR_CMD_UART_BAUD
+            int "Команди: швидкість, бод"
+            default 115200
+    endmenu
+
+    menu "Display and safety"
+        config CAR_MATRIX_INTENSITY
+            int "Яскравість MAX7219 (0..15)"
+            range 0 15
+            default 4
+        config CAR_SCROLL_MS
+            int "Крок прокрутки, мс"
+            default 120
+        config CAR_FAILSAFE_MS
+            int "Failsafe: стоп тяги, якщо немає команди M: довше, мс"
+            default 1000
+    endmenu
+
+    menu "Joystick (ESP32-S3)"
+        config CAR_JOY_ENABLE
+            bool "Керування з джойстика (M:/S: з UART ігноруються)"
+            default y
+        config CAR_JOY_X_GPIO
+            int "Вісь X (кермо), ADC1: GPIO 1..10"
+            range 1 10
+            default 1
+        config CAR_JOY_Y_GPIO
+            int "Вісь Y (тяга), ADC1: GPIO 1..10"
+            range 1 10
+            default 2
+        config CAR_JOY_SW_GPIO
+            int "Кнопка стіка: стоп тяги (-1 = немає)"
+            default 38
+        config CAR_JOY_DEADZONE
+            int "Мертва зона, сирі одиниці 0..4095"
+            range 0 1000
+            default 150
+        config CAR_JOY_INVERT_Y
+            bool "Інвертувати вісь Y (тяга)"
+            default n
+        config CAR_JOY_INVERT_X
+            bool "Інвертувати вісь X (кермо)"
+            default n
+    endmenu
+
+endmenu
