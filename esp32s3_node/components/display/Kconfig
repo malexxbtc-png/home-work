@@ -1,0 +1,23 @@
+menu "Weather display (ST7789P3 76x284)"
+
+config WEATHER_DISPLAY_GAP_X
+    int "Panel gap X (landscape)"
+    range 0 320
+    default 18
+    help
+        Offset of the visible area in controller RAM along the long (284 px)
+        axis after swap_xy. If the picture is shifted, swap GAP_X and GAP_Y.
+
+config WEATHER_DISPLAY_GAP_Y
+    int "Panel gap Y (landscape)"
+    range 0 320
+    default 82
+
+config WEATHER_DISPLAY_INVERT_COLORS
+    bool "Invert colours"
+    default y
+    help
+        Most IPS ST7789 panels need colour inversion. Disable it if the
+        colours look negative.
+
+endmenu

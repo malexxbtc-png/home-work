@@ -1,0 +1,18 @@
+menu "Weather SD card"
+
+config WEATHER_SD_CS_PIN
+    int "SD card CS GPIO (SPI2, shared with the display)"
+    range 0 48
+    default 21
+
+config WEATHER_SD_MAX_FREQ_KHZ
+    int "SD SPI clock (kHz)"
+    range 400 20000
+    default 10000
+
+config WEATHER_SD_RETRY_INTERVAL_S
+    int "Retry mounting a missing card every (seconds)"
+    range 5 3600
+    default 60
+
+endmenu

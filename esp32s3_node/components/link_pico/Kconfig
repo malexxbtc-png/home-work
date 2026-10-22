@@ -1,0 +1,61 @@
+menu "ESP32-S3 to Pico link"
+
+config WEATHER_LINK_PICO_UART_TX_PIN
+    int "UART TX GPIO (-> Pico GP1)"
+    range 0 48
+    default 17
+
+config WEATHER_LINK_PICO_UART_RX_PIN
+    int "UART RX GPIO (<- Pico GP0)"
+    range 0 48
+    default 18
+
+config WEATHER_LINK_PICO_IRQ_PIN
+    int "Pico interrupt GPIO (-> Pico GP2)"
+    range 0 48
+    default 16
+
+config WEATHER_LINK_PICO_UART_BAUD_RATE
+    int "UART baud rate"
+    range 1200 3000000
+    default 115200
+
+config WEATHER_LINK_PICO_UART_BUFFER_SIZE
+    int "UART receive buffer size (bytes)"
+    range 256 4096
+    default 1024
+
+config WEATHER_LINK_PICO_TX_BUFFER_SIZE
+    int "UART transmit buffer size (bytes)"
+    range 256 4096
+    default 1536
+
+config WEATHER_LINK_PICO_MAX_JSON_SIZE
+    int "Maximum JSON message size (bytes)"
+    range 256 2048
+    default 1024
+    help
+        Longest JSON body in either direction. The weather message with a
+        three-day forecast is about 500 bytes.
+
+config WEATHER_LINK_PICO_RX_TIMEOUT_MS
+    int "UART read timeout (ms)"
+    range 10 1000
+    default 100
+
+config WEATHER_LINK_PICO_MUTEX_TIMEOUT_MS
+    int "Data mutex timeout (ms)"
+    range 1 1000
+    default 50
+
+config WEATHER_LINK_PICO_DATA_STALE_TIMEOUT_MS
+    int "Mark Pico data stale after (ms)"
+    range 1000 600000
+    default 15000
+
+config WEATHER_LINK_PICO_IRQ_PULSE_MS
+    int "Pico interrupt pulse (ms)"
+    range 1 1000
+    default 10
+
+endmenu

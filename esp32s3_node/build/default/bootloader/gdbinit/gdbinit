@@ -1,0 +1,2 @@
+source D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/bootloader/gdbinit/symbols
+source D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/bootloader/gdbinit/connect
