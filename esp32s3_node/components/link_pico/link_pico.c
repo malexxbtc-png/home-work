@@ -23,6 +23,10 @@ static const char *TAG = "link_pico";
 
 static char latest_data_json[MAX_JSON];
 static char latest_snap_json[MAX_JSON];
+static char latest_wx_json[MAX_JSON];
+static int64_t time_epoch_local;
+static int64_t time_rx_us;
+static bool time_pending;
 static int64_t latest_data_received_us;
 static SemaphoreHandle_t data_mutex;
 static SemaphoreHandle_t tx_mutex;
@@ -40,7 +44,7 @@ static uint16_t calculate_crc16(const uint8_t *data, size_t len)
   return crc;
 }
 
-/* Перевіряє CRC, розбирає JSON і зберігає повідомлення типу "data" або "snap" */
+/* Перевіряє CRC, розбирає JSON і зберігає повідомлення типу "data", "snap", "wx" або "time" */
 static bool store_received_line(char *line)
 {
   char *crc_separator = strrchr(line, '*');
@@ -66,7 +70,7 @@ static bool store_received_line(char *line)
 
   cJSON *root = cJSON_Parse(line);
   if (root == NULL) {
-    ESP_LOGW(TAG, "Ignoring invalid JSON received from Pico");
+    ESP_LOGW(TAG, "Ignoring invalid JSON received from master");
     return false;
   }
 
@@ -77,6 +81,19 @@ static bool store_received_line(char *line)
       destination = latest_data_json;
     } else if (strcmp(type->valuestring, "snap") == 0) {
       destination = latest_snap_json;
+    } else if (strcmp(type->valuestring, "wx") == 0) {
+      destination = latest_wx_json;
+    } else if (strcmp(type->valuestring, "time") == 0) {
+      const cJSON *epoch = cJSON_GetObjectItemCaseSensitive(root, "epoch");
+      if (cJSON_IsNumber(epoch) && epoch->valuedouble > 0 &&
+          xSemaphoreTake(data_mutex, MUTEX_TICKS) == pdTRUE) {
+        time_epoch_local = (int64_t)epoch->valuedouble;
+        time_rx_us = esp_timer_get_time();
+        time_pending = true;
+        xSemaphoreGive(data_mutex);
+      }
+      cJSON_Delete(root);
+      return true;
     }
   }
 
@@ -133,7 +150,7 @@ void link_pico_init(void)
   data_mutex = xSemaphoreCreateMutex();
   tx_mutex = xSemaphoreCreateMutex();
   if (data_mutex == NULL || tx_mutex == NULL) {
-    ESP_LOGE(TAG, "Failed to create Pico link mutexes");
+    ESP_LOGE(TAG, "Failed to create master link mutexes");
     return;
   }
 
@@ -163,7 +180,7 @@ void link_pico_init(void)
                                       CONFIG_WEATHER_LINK_PICO_TX_BUFFER_SIZE, 0, NULL, 0));
 
   if (xTaskCreate(uart_rx_task, "uart_rx_task", 4096, NULL, 5, NULL) != pdPASS) {
-    ESP_LOGE(TAG, "Failed to create Pico UART RX task");
+    ESP_LOGE(TAG, "Failed to create master UART RX task");
   }
 }
 
@@ -181,7 +198,7 @@ bool link_pico_send_json(const char *json_str)
   }
   size_t json_length = strlen(json_str);
   if (json_length == 0 || json_length >= MAX_JSON) {
-    ESP_LOGE(TAG, "Pico UART message has invalid length %u", (unsigned)json_length);
+    ESP_LOGE(TAG, "Master UART message has invalid length %u", (unsigned)json_length);
     return false;
   }
 
@@ -248,6 +265,40 @@ bool link_pico_get_latest_snap(char *dest, size_t max_len)
     found = copy_message(latest_snap_json, dest, max_len);
     if (found) {
       latest_snap_json[0] = '\0';
+    }
+    xSemaphoreGive(data_mutex);
+  }
+  return found;
+}
+
+bool link_pico_take_wx(char *dest, size_t max_len)
+{
+  if (data_mutex == NULL || dest == NULL || max_len == 0) {
+    return false;
+  }
+  bool found = false;
+  if (xSemaphoreTake(data_mutex, MUTEX_TICKS) == pdTRUE) {
+    found = copy_message(latest_wx_json, dest, max_len);
+    if (found) {
+      latest_wx_json[0] = '\0';
+    }
+    xSemaphoreGive(data_mutex);
+  }
+  return found;
+}
+
+bool link_pico_take_time(int64_t *epoch_local)
+{
+  if (data_mutex == NULL || epoch_local == NULL) {
+    return false;
+  }
+  bool found = false;
+  if (xSemaphoreTake(data_mutex, MUTEX_TICKS) == pdTRUE) {
+    if (time_pending) {
+      int64_t age_s = (esp_timer_get_time() - time_rx_us) / 1000000;
+      *epoch_local = time_epoch_local + (age_s > 0 ? age_s : 0);
+      time_pending = false;
+      found = true;
     }
     xSemaphoreGive(data_mutex);
   }

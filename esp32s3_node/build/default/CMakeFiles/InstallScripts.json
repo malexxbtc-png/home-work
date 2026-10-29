@@ -178,6 +178,9 @@
 		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/lvgl__lvgl/cmake_install.cmake",
 		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/display/cmake_install.cmake",
 		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/sd_card/cmake_install.cmake",
+		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp_jpeg/cmake_install.cmake",
+		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp32-camera/cmake_install.cmake",
+		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/camera/cmake_install.cmake",
 		"D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/main/cmake_install.cmake"
 	],
 	"Parallel" : false

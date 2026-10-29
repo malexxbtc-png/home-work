@@ -1,0 +1,88 @@
+menu "Weather forecast"
+
+config WEATHER_FORECAST_WIFI_SSID
+    string "Wi-Fi SSID"
+    default ""
+    help
+        Wi-Fi network name used by the forecast component.
+
+config WEATHER_FORECAST_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default ""
+    help
+        Wi-Fi password. Configure locally; do not commit credentials.
+
+config WEATHER_FORECAST_LATITUDE
+    string "Open-Meteo latitude"
+    default "49.9935"
+    help
+        Latitude passed to the Open-Meteo API.
+
+config WEATHER_FORECAST_LONGITUDE
+    string "Open-Meteo longitude"
+    default "36.2304"
+    help
+        Longitude passed to the Open-Meteo API.
+
+config WEATHER_FORECAST_TIMEZONE
+    string "Open-Meteo timezone"
+    default "Europe/Kyiv"
+    help
+        Timezone passed to the Open-Meteo API.
+
+config WEATHER_FORECAST_POSIX_TZ
+    string "POSIX local timezone"
+    default "EET-2EEST,M3.5.0/3,M10.5.0/4"
+    help
+        POSIX TZ string used by the C library for local time and daylight saving.
+
+config WEATHER_FORECAST_SNTP_SERVER
+    string "SNTP server"
+    default "pool.ntp.org"
+
+config WEATHER_FORECAST_WIFI_CONNECT_TIMEOUT_MS
+    int "Wi-Fi connection wait (ms)"
+    range 1000 120000
+    default 30000
+
+config WEATHER_FORECAST_WIFI_RETRY_INTERVAL_MS
+    int "Wi-Fi / weather retry interval (ms)"
+    range 1000 600000
+    default 30000
+
+config WEATHER_FORECAST_HTTP_TIMEOUT_MS
+    int "Open-Meteo HTTP timeout (ms)"
+    range 1000 60000
+    default 10000
+
+config WEATHER_FORECAST_UPDATE_INTERVAL_MINUTES
+    int "Forecast update interval (minutes)"
+    range 1 1440
+    default 15
+
+config WEATHER_FORECAST_DAYS
+    int "Forecast days"
+    range 1 7
+    default 3
+
+config WEATHER_FORECAST_STALE_AFTER_SECONDS
+    int "Mark forecast stale after (seconds)"
+    range 1 604800
+    default 7200
+
+config WEATHER_FORECAST_HTTP_RESPONSE_BUFFER_SIZE
+    int "HTTP response buffer size (bytes)"
+    range 1024 16384
+    default 4096
+
+config WEATHER_FORECAST_MUTEX_TIMEOUT_MS
+    int "Forecast read mutex timeout (ms)"
+    range 1 1000
+    default 50
+
+config WEATHER_FORECAST_UPDATE_MUTEX_TIMEOUT_MS
+    int "Forecast update mutex timeout (ms)"
+    range 1 1000
+    default 100
+
+endmenu

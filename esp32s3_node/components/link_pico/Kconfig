@@ -1,17 +1,17 @@
-menu "ESP32-S3 to Pico link"
+menu "ESP32-S3 to master link"
 
 config WEATHER_LINK_PICO_UART_TX_PIN
-    int "UART TX GPIO (-> Pico GP1)"
+    int "UART TX GPIO (-> master GPIO16)"
     range 0 48
     default 17
 
 config WEATHER_LINK_PICO_UART_RX_PIN
-    int "UART RX GPIO (<- Pico GP0)"
+    int "UART RX GPIO (<- master GPIO17)"
     range 0 48
     default 18
 
 config WEATHER_LINK_PICO_IRQ_PIN
-    int "Pico interrupt GPIO (-> Pico GP2)"
+    int "Master interrupt GPIO (optional)"
     range 0 48
     default 16
 
@@ -35,8 +35,8 @@ config WEATHER_LINK_PICO_MAX_JSON_SIZE
     range 256 2048
     default 1024
     help
-        Longest JSON body in either direction. The weather message with a
-        three-day forecast is about 500 bytes.
+        Longest JSON body in either direction. The weather message from the
+        master (three days) is about 330 bytes, seven days about 560.
 
 config WEATHER_LINK_PICO_RX_TIMEOUT_MS
     int "UART read timeout (ms)"
@@ -49,12 +49,12 @@ config WEATHER_LINK_PICO_MUTEX_TIMEOUT_MS
     default 50
 
 config WEATHER_LINK_PICO_DATA_STALE_TIMEOUT_MS
-    int "Mark Pico data stale after (ms)"
+    int "Mark master data stale after (ms)"
     range 1000 600000
     default 15000
 
 config WEATHER_LINK_PICO_IRQ_PULSE_MS
-    int "Pico interrupt pulse (ms)"
+    int "Master interrupt pulse (ms)"
     range 1 1000
     default 10
 

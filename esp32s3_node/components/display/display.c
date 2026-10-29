@@ -30,27 +30,32 @@ static const char *TAG = "display";
 
 #define PIN_NUM_SCLK    39
 #define PIN_NUM_MOSI    38
-#define PIN_NUM_MISO    40
 #define PIN_NUM_LCD_CS  41
 #define PIN_NUM_LCD_DC  42
 #define PIN_NUM_LCD_RST 47
 
-/* Розкладка 284x76: три колонки зверху і смуга тривог знизу */
+/* Розкладка 284x76: час | у приміщенні (лише температура) | надворі, і смуга тривог знизу */
 #define COL1_X 2
 #define COL1_W 80
 #define SEP1_X 84
 #define COL2_X 88
-#define COL2_W 94
-#define SEP2_X 184
-#define COL3_X 188
-#define COL3_W 94
+#define COL2_W 52
+#define SEP2_X 142
+#define COL3_X 146
+#define COL3_W 84
+#define COL4_X 232            /* вітер і опади праворуч від зовнішньої температури */
+#define COL4_W 52
 #define COLS_H 60
 
 static lv_obj_t *label_time;
 static lv_obj_t *label_date;
 static lv_obj_t *label_weekday;
-static lv_obj_t *label_local;
-static lv_obj_t *label_street;
+static lv_obj_t *label_in_temp;
+static lv_obj_t *label_out_temp;
+static lv_obj_t *label_out_range;
+static lv_obj_t *label_wind;
+static lv_obj_t *label_rain;
+static lv_obj_t *label_attr;
 static lv_obj_t *label_alert;
 static lv_disp_drv_t disp_drv;
 
@@ -113,7 +118,7 @@ static bool json_number(const cJSON *object, const char *key, double *value)
   return true;
 }
 
-/* Оновлює середню колонку і рядок тривог. Повертає, чи свіжі дані від Pico. */
+/* Оновлює температуру в приміщенні і рядок тривог */
 static void update_local_and_alerts(void)
 {
   char pico_buf[CONFIG_WEATHER_LINK_PICO_MAX_JSON_SIZE];
@@ -121,20 +126,16 @@ static void update_local_and_alerts(void)
   bool have = link_pico_get_latest_data(pico_buf, sizeof(pico_buf), &age_ms);
   bool fresh = have && age_ms <= CONFIG_WEATHER_LINK_PICO_DATA_STALE_TIMEOUT_MS;
 
-  char local_buf[128] = "LOCAL\nwaiting for\nPico...";
-  char alert_buf[96] = "PICO OFFLINE";
+  char in_buf[24] = "--.-";
+  char alert_buf[96] = "MASTER OFFLINE";
   lv_color_t alert_color = lv_color_hex(0xFFB000);
 
   cJSON *root = have ? cJSON_Parse(pico_buf) : NULL;
   if (root != NULL) {
-    double t, rh, p, td;
-    char t_s[16] = "--", rh_s[16] = "--", p_s[16] = "--", td_s[16] = "--";
-    if (json_number(root, "T", &t))   snprintf(t_s, sizeof(t_s), "%.1fC", t);
-    if (json_number(root, "RH", &rh)) snprintf(rh_s, sizeof(rh_s), "%.0f%%", rh);
-    if (json_number(root, "P", &p))   snprintf(p_s, sizeof(p_s), "%.0f hPa", p);
-    if (json_number(root, "Td", &td)) snprintf(td_s, sizeof(td_s), "%.1fC", td);
-    snprintf(local_buf, sizeof(local_buf), "LOCAL%s\nT  %s\nRH %s\nP  %s\nTd %s",
-             fresh ? "" : " (old)", t_s, rh_s, p_s, td_s);
+    double t;
+    if (fresh && json_number(root, "T", &t)) {
+      snprintf(in_buf, sizeof(in_buf), "%.1f", t);
+    }
 
     if (fresh) {
       const cJSON *alerts = cJSON_GetObjectItemCaseSensitive(root, "alert");
@@ -163,29 +164,45 @@ static void update_local_and_alerts(void)
     cJSON_Delete(root);
   }
 
-  lv_label_set_text(label_local, local_buf);
+  lv_label_set_text(label_in_temp, in_buf);
   lv_label_set_text(label_alert, alert_buf);
   lv_obj_set_style_text_color(label_alert, alert_color, LV_PART_MAIN);
 }
 
+/* Блок «надворі»: температура великою, вітер і опади з підписами, діапазон дня */
 static void update_street(void)
 {
   current_wx_t wx;
   if (!forecast_get_current(&wx)) {
-    lv_label_set_text(label_street, "STREET\nwaiting for\nweather...\n\nopen-meteo.com");
+    lv_label_set_text(label_out_temp, "--.-");
+    lv_label_set_text(label_out_range, "Waiting...");
+    lv_label_set_text(label_wind, "WIND\n--");
+    lv_label_set_text(label_rain, "RAIN\n--");
     return;
   }
 
-  char range_s[24] = "";
+  char buf[48];
+  snprintf(buf, sizeof(buf), "%.1f", wx.temp);
+  lv_label_set_text(label_out_temp, buf);
+  lv_obj_set_style_text_color(label_out_temp,
+                              wx.is_stale ? lv_color_hex(0x909090) : lv_color_white(), LV_PART_MAIN);
+
   if (wx.forecast_days > 0) {
-    snprintf(range_s, sizeof(range_s), "Day %.0f..%.0fC",
-             wx.daily[0].temperature_min, wx.daily[0].temperature_max);
+    snprintf(buf, sizeof(buf), "Today %.0f..%.0f", wx.daily[0].temperature_min,
+             wx.daily[0].temperature_max);
+  } else {
+    snprintf(buf, sizeof(buf), "%s", wx.is_stale ? "old data" : "");
   }
-  char buf[160];
-  snprintf(buf, sizeof(buf), "STREET%s\nT %.1fC W %.1f\nRain %.1f S %.1f\n%s\nopen-meteo.com",
-           wx.is_stale ? " (old)" : "", wx.temp, wx.wind_speed,
-           wx.precipitation, wx.snowfall, range_s);
-  lv_label_set_text(label_street, buf);
+  lv_label_set_text(label_out_range, buf);
+
+  snprintf(buf, sizeof(buf), "WIND\n%.1f m/s", wx.wind_speed);
+  lv_label_set_text(label_wind, buf);
+  if (wx.snowfall > 0.0f) {
+    snprintf(buf, sizeof(buf), "SNOW\n%.1f cm", wx.snowfall);
+  } else {
+    snprintf(buf, sizeof(buf), "RAIN\n%.1f mm", wx.precipitation);
+  }
+  lv_label_set_text(label_rain, buf);
 }
 
 static void update_display_data(void)
@@ -242,7 +259,11 @@ void display_init(void)
   spi_bus_config_t buscfg = {
       .sclk_io_num = PIN_NUM_SCLK,
       .mosi_io_num = PIN_NUM_MOSI,
-      .miso_io_num = PIN_NUM_MISO,
+#if CONFIG_WEATHER_SD_SHARED_BUS
+      .miso_io_num = CONFIG_WEATHER_SD_MISO_PIN,   /* SD сидить на цій же шині */
+#else
+      .miso_io_num = -1,              /* ST7789 нічого не віддає; GPIO40 вільний для SD */
+#endif
       .quadwp_io_num = -1,            /* без цього поле = 0, і SPI займає GPIO0 */
       .quadhd_io_num = -1,
       .max_transfer_sz = TFT_PHYSICAL_H * TFT_DRAW_BUFFER_LINES * sizeof(lv_color_t),
@@ -316,13 +337,34 @@ void display_init(void)
   label_date = make_label(screen, &lv_font_montserrat_10, COL1_X, 38, COL1_W);
   label_weekday = make_label(screen, &lv_font_montserrat_10, COL1_X, 50, COL1_W);
 
-  /* Середня і права колонки */
-  label_local = make_label(screen, &lv_font_montserrat_10, COL2_X, 2, COL2_W);
-  label_street = make_label(screen, &lv_font_montserrat_10, COL3_X, 2, COL3_W);
+  /* Середня колонка: тільки температура в приміщенні */
+  lv_obj_t *cap_in = make_label(screen, &lv_font_montserrat_10, COL2_X, 2, COL2_W);
+  lv_label_set_text(cap_in, "INSIDE, C");
+  label_in_temp = make_label(screen, &lv_font_montserrat_14, COL2_X, 18, COL2_W);
+  lv_label_set_text(label_in_temp, "--.-");
+  lv_obj_t *cap_in_unit = make_label(screen, &lv_font_montserrat_10, COL2_X, 36, COL2_W);
+  lv_label_set_text(cap_in_unit, "deg C");
+
+  /* Права частина: надворі (Open-Meteo) */
+  lv_obj_t *cap_out = make_label(screen, &lv_font_montserrat_10, COL3_X, 2, COL3_W);
+  lv_label_set_text(cap_out, "OUTSIDE, C");
+  label_out_temp = make_label(screen, &lv_font_montserrat_28, COL3_X, 12, COL3_W);
+  lv_label_set_text(label_out_temp, "--.-");
+  label_out_range = make_label(screen, &lv_font_montserrat_10, COL3_X, 46, COL3_W);
+  lv_label_set_text(label_out_range, "");
+  label_wind = make_label(screen, &lv_font_montserrat_10, COL4_X, 12, COL4_W);
+  lv_label_set_text(label_wind, "WIND\n--");
+  label_rain = make_label(screen, &lv_font_montserrat_10, COL4_X, 38, COL4_W);
+  lv_label_set_text(label_rain, "RAIN\n--");
 
   /* Нижня смуга: тривоги на всю ширину */
-  label_alert = make_label(screen, &lv_font_montserrat_12, COL1_X, COLS_H + 2, 280);
+  label_alert = make_label(screen, &lv_font_montserrat_12, COL1_X, COLS_H + 2, 190);
   lv_label_set_text(label_alert, "starting...");
+  /* Подяка джерелу даних (Open-Meteo, CC BY 4.0) */
+  label_attr = make_label(screen, &lv_font_montserrat_10, 196, COLS_H + 4, 86);
+  lv_obj_set_style_text_align(label_attr, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+  lv_obj_set_style_text_color(label_attr, lv_color_hex(0x808080), LV_PART_MAIN);
+  lv_label_set_text(label_attr, "open-meteo.com");
 }
 
 void display_start_task(void)

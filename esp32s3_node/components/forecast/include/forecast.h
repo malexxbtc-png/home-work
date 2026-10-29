@@ -6,8 +6,10 @@
 
 #define FORECAST_MAX_DAYS 7
 
+/* Назва компонента збережена, але Wi-Fi тут немає: погоду з Open-Meteo і час SNTP
+   отримує майстер (ESP32 DevKit) і надсилає по UART повідомленнями "wx" і "time". */
+
 typedef struct {
-  char date[11];                          /* YYYY-MM-DD */
   float temperature_min;
   float temperature_max;
   float precipitation_probability_max;    /* % */
@@ -17,29 +19,29 @@ typedef struct {
 
 typedef struct {
   float temp;                             /* °C */
-  float app_temp;
   float humidity;                         /* %, NAN якщо немає */
   bool humidity_valid;
   float precipitation;                    /* мм */
   float snowfall;                         /* см */
   int weather_code;
   int cloud_cover;                        /* % */
-  float pressure;                         /* гПа, на рівні моря */
   float wind_speed;                       /* м/с */
   float wind_gusts;                       /* м/с */
   float wind_direction;                   /* градуси */
-  int64_t timestamp;                      /* Unix-час отримання, 0 якщо SNTP ще не синхронізовано */
-  int64_t fetched_at_us;                  /* esp_timer на момент отримання */
+  int64_t fetched_at_us;                  /* esp_timer на момент запиту до Open-Meteo (може бути < 0 відразу після старту) */
   bool is_stale;                          /* дані старші за налаштований поріг */
   uint8_t forecast_days;
   forecast_day_t daily[FORECAST_MAX_DAYS];
 } current_wx_t;
 
-/* Створює м'ютекс і задає часову зону (час до Wi-Fi вже показується правильно) */
+/* Створює м'ютекс, задає часову зону UTC: системний годинник вузла = місцевий час від майстра */
 void forecast_init(void);
 
-/* Запускає задачу: Wi-Fi, SNTP, запит до Open-Meteo кожні N хвилин */
-void forecast_start_task(void);
+/* Розбирає повідомлення {"t":"wx",...} від майстра. true, якщо дані прийняті */
+bool forecast_update_from_json(const char *json);
+
+/* Ставить системний годинник за повідомленням {"t":"time","epoch":N}: N = місцевий Unix-час */
+void forecast_set_local_time(int64_t local_epoch);
 
 /* Копія останніх даних. false, якщо даних ще немає */
 bool forecast_get_current(current_wx_t *weather);

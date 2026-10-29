@@ -1,9 +1,33 @@
 menu "Weather SD card"
 
+config WEATHER_SD_SHARED_BUS
+    bool "SD shares the display SPI2 bus (SCK=39, MOSI=38 as the TFT)"
+    default n
+    help
+        n: SD has its own SPI3 bus on the SCK/MOSI/MISO pins below (default).
+        y: SD wires to the TFT SCK (GPIO39) and MOSI (GPIO38); only MISO and CS
+           are separate. SCK/MOSI options below are then ignored. Use this if
+           the card worked on the shared wiring and does not on SPI3.
+
 config WEATHER_SD_CS_PIN
-    int "SD card CS GPIO (SPI2, shared with the display)"
+    int "SD card CS GPIO (own SPI3 bus)"
     range 0 48
     default 21
+
+config WEATHER_SD_SCK_PIN
+    int "SD card SCK GPIO"
+    range 0 48
+    default 45
+
+config WEATHER_SD_MOSI_PIN
+    int "SD card MOSI GPIO"
+    range 0 48
+    default 3
+
+config WEATHER_SD_MISO_PIN
+    int "SD card MISO GPIO"
+    range 0 48
+    default 40
 
 config WEATHER_SD_MAX_FREQ_KHZ
     int "SD SPI clock (kHz)"
@@ -14,5 +38,9 @@ config WEATHER_SD_RETRY_INTERVAL_S
     int "Retry mounting a missing card every (seconds)"
     range 5 3600
     default 60
+
+config WEATHER_SD_DEBUG
+    bool "Debug: read sector 0 every 500 ms and log when the card stops responding"
+    default n
 
 endmenu

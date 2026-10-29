@@ -218,6 +218,14 @@ D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/link_pico/liblink_pico.a
 D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/forecast/libforecast.a
 D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/sd_card/libsd_card.a
 D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/fatfs/libfatfs.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/driver/libdriver.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp_jpeg/libespressif__esp_jpeg.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp32-camera/libespressif__esp32-camera.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/esp_driver_ledc/libesp_driver_ledc.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp_jpeg/libespressif__esp_jpeg.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/camera/libcamera.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/sd_card/libsd_card.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/espressif__esp32-camera/libespressif__esp32-camera.a
 D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/main/libmain.a
 D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/display/libdisplay.a
-D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/sd_card/libsd_card.a
+D:/ESP_IFD_VS/EMB_hw/esp32s3_node/build/default/esp-idf/camera/libcamera.a

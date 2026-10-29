@@ -33,5 +33,6 @@
     "--query-driver=**",
     "--compile-commands-dir=d:\\ESP_IFD_VS\\EMB_hw\\esp_stm_slave\\build"
   ],
-  "idf.flashType": "UART"
+  "idf.flashType": "UART",
+  "idf.monitorPort": "COM8"
 }

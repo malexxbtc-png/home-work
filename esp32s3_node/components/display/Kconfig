@@ -1,5 +1,33 @@
 menu "Weather display (ST7789P3 76x284)"
 
+config WEATHER_DISPLAY_PIN_SCLK
+    int "TFT SCK GPIO"
+    range 0 48
+    default 39
+
+config WEATHER_DISPLAY_PIN_MOSI
+    int "TFT MOSI (SDA) GPIO"
+    range 0 48
+    default 38
+    help
+        The on-board RGB LED sits on GPIO48 (older boards) or GPIO38 (v1.1).
+        If it blinks with the display, move this pin to the other one.
+
+config WEATHER_DISPLAY_PIN_CS
+    int "TFT CS GPIO"
+    range 0 48
+    default 41
+
+config WEATHER_DISPLAY_PIN_DC
+    int "TFT DC GPIO"
+    range 0 48
+    default 42
+
+config WEATHER_DISPLAY_PIN_RST
+    int "TFT RST GPIO"
+    range 0 48
+    default 47
+
 config WEATHER_DISPLAY_GAP_X
     int "Panel gap X (landscape)"
     range 0 320

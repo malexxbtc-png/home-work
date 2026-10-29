@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 780" width="1320" height="780" font-family="DejaVu Sans, Arial, sans-serif">
+<rect width="1320" height="780" fill="#ffffff"/>
+<text x="20" y="30" font-size="20" font-weight="bold" fill="#1f2328">Майстер: ESP32 DevKit (WROOM-32) — схема підключення</text>
+<rect x="40" y="70" width="230" height="560" rx="6" fill="#eef6ff" stroke="#0969da" stroke-width="1.5"/>
+<text x="155.0" y="90" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">ESP32 DevKit</text>
+<text x="155.0" y="106" font-size="11" text-anchor="middle" fill="#57606a">ESP-IDF, логіка 3,3 В</text>
+<circle cx="270" cy="110" r="3.5" fill="#1f2328"/>
+<text x="262" y="114" font-size="11.5" text-anchor="end" fill="#1f2328">3V3</text>
+<circle cx="270" cy="135" r="3.5" fill="#1f2328"/>
+<text x="262" y="139" font-size="11.5" text-anchor="end" fill="#1f2328">GND</text>
+<circle cx="270" cy="175" r="3.5" fill="#1f2328"/>
+<text x="262" y="179" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO21  I2C SDA</text>
+<circle cx="270" cy="200" r="3.5" fill="#1f2328"/>
+<text x="262" y="204" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO22  I2C SCL</text>
+<circle cx="270" cy="260" r="3.5" fill="#1f2328"/>
+<text x="262" y="264" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO23  PIR</text>
+<circle cx="270" cy="320" r="3.5" fill="#1f2328"/>
+<text x="262" y="324" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO34  ADC (кнопки)</text>
+<circle cx="270" cy="450" r="3.5" fill="#1f2328"/>
+<text x="262" y="454" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO17  UART2 TX</text>
+<circle cx="270" cy="470" r="3.5" fill="#1f2328"/>
+<text x="262" y="474" font-size="11.5" text-anchor="end" fill="#1f2328">GPIO16  UART2 RX</text>
+<circle cx="270" cy="490" r="3.5" fill="#1f2328"/>
+<text x="262" y="494" font-size="11.5" text-anchor="end" fill="#1f2328">GND</text>
+<path d="M270,110 L520,110 L520,720" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="520" y="736" font-size="10.5" text-anchor="middle" fill="#d1242f" font-weight="bold">3V3</text>
+<path d="M270,135 L545,135 L545,720" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="545" y="750" font-size="10.5" text-anchor="middle" fill="#57606a" font-weight="bold">GND</text>
+<path d="M270,175 L570,175 L570,720" fill="none" stroke="#0969da" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="570" y="736" font-size="10.5" text-anchor="middle" fill="#0969da" font-weight="bold">SDA</text>
+<path d="M270,200 L595,200 L595,720" fill="none" stroke="#1a7f37" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="595" y="750" font-size="10.5" text-anchor="middle" fill="#1a7f37" font-weight="bold">SCL</text>
+<rect x="700" y="80" width="250" height="125" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="825.0" y="100" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">SSD1306 OLED 128×64</text>
+<text x="825.0" y="116" font-size="11" text-anchor="middle" fill="#57606a">I2C 0x3C</text>
+<circle cx="700" cy="132" r="3.5" fill="#1f2328"/>
+<text x="708" y="136" font-size="11.5" text-anchor="start" fill="#1f2328">VCC</text>
+<path d="M520,132 L700,132" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="520" cy="132" r="3.5" fill="#d1242f"/>
+<circle cx="700" cy="149" r="3.5" fill="#1f2328"/>
+<text x="708" y="153" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<path d="M545,149 L700,149" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="545" cy="149" r="3.5" fill="#57606a"/>
+<circle cx="700" cy="166" r="3.5" fill="#1f2328"/>
+<text x="708" y="170" font-size="11.5" text-anchor="start" fill="#1f2328">SDA</text>
+<path d="M570,166 L700,166" fill="none" stroke="#0969da" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="570" cy="166" r="3.5" fill="#0969da"/>
+<circle cx="700" cy="183" r="3.5" fill="#1f2328"/>
+<text x="708" y="187" font-size="11.5" text-anchor="start" fill="#1f2328">SCL</text>
+<path d="M595,183 L700,183" fill="none" stroke="#1a7f37" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="595" cy="183" r="3.5" fill="#1a7f37"/>
+<rect x="700" y="225" width="250" height="125" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="825.0" y="245" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">DS3231 / DS1307 RTC</text>
+<text x="825.0" y="261" font-size="11" text-anchor="middle" fill="#57606a">I2C 0x68</text>
+<circle cx="700" cy="277" r="3.5" fill="#1f2328"/>
+<text x="708" y="281" font-size="11.5" text-anchor="start" fill="#1f2328">VCC</text>
+<path d="M520,277 L700,277" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="520" cy="277" r="3.5" fill="#d1242f"/>
+<circle cx="700" cy="294" r="3.5" fill="#1f2328"/>
+<text x="708" y="298" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<path d="M545,294 L700,294" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="545" cy="294" r="3.5" fill="#57606a"/>
+<circle cx="700" cy="311" r="3.5" fill="#1f2328"/>
+<text x="708" y="315" font-size="11.5" text-anchor="start" fill="#1f2328">SDA</text>
+<path d="M570,311 L700,311" fill="none" stroke="#0969da" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="570" cy="311" r="3.5" fill="#0969da"/>
+<circle cx="700" cy="328" r="3.5" fill="#1f2328"/>
+<text x="708" y="332" font-size="11.5" text-anchor="start" fill="#1f2328">SCL</text>
+<path d="M595,328 L700,328" fill="none" stroke="#1a7f37" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="595" cy="328" r="3.5" fill="#1a7f37"/>
+<rect x="700" y="370" width="250" height="125" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="825.0" y="390" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">STM32F411 BlackPill</text>
+<text x="825.0" y="406" font-size="11" text-anchor="middle" fill="#57606a">I2C slave 0x30, BME/BMP280</text>
+<circle cx="700" cy="422" r="3.5" fill="#1f2328"/>
+<text x="708" y="426" font-size="11.5" text-anchor="start" fill="#1f2328">3V3</text>
+<path d="M520,422 L700,422" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="520" cy="422" r="3.5" fill="#d1242f"/>
+<circle cx="700" cy="439" r="3.5" fill="#1f2328"/>
+<text x="708" y="443" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<path d="M545,439 L700,439" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="545" cy="439" r="3.5" fill="#57606a"/>
+<circle cx="700" cy="456" r="3.5" fill="#1f2328"/>
+<text x="708" y="460" font-size="11.5" text-anchor="start" fill="#1f2328">I2C SDA</text>
+<path d="M570,456 L700,456" fill="none" stroke="#0969da" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="570" cy="456" r="3.5" fill="#0969da"/>
+<circle cx="700" cy="473" r="3.5" fill="#1f2328"/>
+<text x="708" y="477" font-size="11.5" text-anchor="start" fill="#1f2328">I2C SCL</text>
+<path d="M595,473 L700,473" fill="none" stroke="#1a7f37" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="595" cy="473" r="3.5" fill="#1a7f37"/>
+<rect x="700" y="515" width="250" height="95" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="825.0" y="535" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">PIR (AM312 / HC-SR501)</text>
+<text x="825.0" y="551" font-size="11" text-anchor="middle" fill="#57606a">вихід 3,3 В</text>
+<circle cx="700" cy="567" r="3.5" fill="#1f2328"/>
+<text x="708" y="571" font-size="11.5" text-anchor="start" fill="#1f2328">VCC</text>
+<circle cx="700" cy="584" r="3.5" fill="#1f2328"/>
+<text x="708" y="588" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<circle cx="700" cy="601" r="3.5" fill="#1f2328"/>
+<text x="708" y="605" font-size="11.5" text-anchor="start" fill="#1f2328">OUT</text>
+<path d="M520,567 L700,567" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="520" cy="567" r="3.5" fill="#d1242f"/>
+<path d="M545,584 L700,584" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="545" cy="584" r="3.5" fill="#57606a"/>
+<path d="M270,260 L640,260 L640,601 L700,601" fill="none" stroke="#bc4c00" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="400" y="254" font-size="10.5" fill="#bc4c00" text-anchor="middle" font-weight="bold" stroke="#ffffff" stroke-width="3" paint-order="stroke">PIR</text>
+<rect x="700" y="640" width="250" height="95" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="825.0" y="660" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">ADKeyboard (5 кнопок)</text>
+<text x="825.0" y="676" font-size="11" text-anchor="middle" fill="#57606a">резисторна драбина</text>
+<circle cx="700" cy="692" r="3.5" fill="#1f2328"/>
+<text x="708" y="696" font-size="11.5" text-anchor="start" fill="#1f2328">VCC  (3V3!)</text>
+<circle cx="700" cy="709" r="3.5" fill="#1f2328"/>
+<text x="708" y="713" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<circle cx="700" cy="726" r="3.5" fill="#1f2328"/>
+<text x="708" y="730" font-size="11.5" text-anchor="start" fill="#1f2328">OUT</text>
+<path d="M520,692 L700,692" fill="none" stroke="#d1242f" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="520" cy="692" r="3.5" fill="#d1242f"/>
+<path d="M545,709 L700,709" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="545" cy="709" r="3.5" fill="#57606a"/>
+<path d="M270,320 L660,320 L660,726 L700,726" fill="none" stroke="#bc4c00" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="400" y="314" font-size="10.5" fill="#bc4c00" text-anchor="middle" font-weight="bold" stroke="#ffffff" stroke-width="3" paint-order="stroke">KEYS</text>
+<rect x="330" y="398" width="170" height="122" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+<text x="415.0" y="418" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328">ESP32-S3 вузол</text>
+<text x="415.0" y="434" font-size="11" text-anchor="middle" fill="#57606a">UART 115200 8N1</text>
+<circle cx="330" cy="450" r="3.5" fill="#1f2328"/>
+<text x="338" y="454" font-size="11.5" text-anchor="start" fill="#1f2328">RX  GPIO18</text>
+<circle cx="330" cy="470" r="3.5" fill="#1f2328"/>
+<text x="338" y="474" font-size="11.5" text-anchor="start" fill="#1f2328">TX  GPIO17</text>
+<circle cx="330" cy="490" r="3.5" fill="#1f2328"/>
+<text x="338" y="494" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<path d="M270,450 L330,450" fill="none" stroke="#8250df" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M270,470 L330,470" fill="none" stroke="#8250df" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M270,490 L330,490" fill="none" stroke="#57606a" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="970" y="100" font-size="11.5" text-anchor="start" fill="#57606a">Підтяжки I2C: внутрішні (увімкнені в коді).</text>
+<text x="970" y="116" font-size="11.5" text-anchor="start" fill="#57606a">Модулі DS1307 часто мають підтяжки до 5 В:</text>
+<text x="970" y="132" font-size="11.5" text-anchor="start" fill="#57606a">краще DS3231 або зніміть резистори,</text>
+<text x="970" y="148" font-size="11.5" text-anchor="start" fill="#57606a">інакше 5 В потрапить на піни ESP32.</text>
+<text x="970" y="255" font-size="11.5" text-anchor="start" fill="#57606a">Wi-Fi + SNTP + Open-Meteo — на цій платі:</text>
+<text x="970" y="271" font-size="11.5" text-anchor="start" fill="#57606a">антена вбудована, Wi-Fi 2,4 ГГц.</text>
+<text x="970" y="287" font-size="11.5" text-anchor="start" fill="#57606a">Живлення USB 5 В, ≥ 500 мА.</text>
+<text x="970" y="200" font-size="11.5" text-anchor="start" fill="#57606a">Піни I2C у STM32 — як у вашому CubeMX</text>
+<text x="970" y="216" font-size="11.5" text-anchor="start" fill="#57606a">(зазвичай PB6 SCL / PB7 SDA).</text>
+<text x="970" y="520" font-size="11.5" text-anchor="start" fill="#57606a">PIR: AM312 живити 3,3 В;</text>
+<text x="970" y="536" font-size="11.5" text-anchor="start" fill="#57606a">HC-SR501 — 5 В (вихід 3,3 В),</text>
+<text x="970" y="552" font-size="11.5" text-anchor="start" fill="#57606a">тоді VCC беріть з пина 5V плати.</text>
+<text x="970" y="650" font-size="11.5" text-anchor="start" fill="#d1242f">Кнопки (мВ): RIGHT 0, UP 430, DOWN 990,</text>
+<text x="970" y="666" font-size="11.5" text-anchor="start" fill="#d1242f">LEFT 1540, SELECT 2380, вільно ≈3,1 В.</text>
+<text x="970" y="682" font-size="11.5" text-anchor="start" fill="#d1242f">ADKeyboard живити ЛИШЕ від 3,3 В.</text>
+<text x="970" y="698" font-size="11.5" text-anchor="start" fill="#d1242f">Інші номінали: утримуйте кнопку</text>
+<text x="970" y="714" font-size="11.5" text-anchor="start" fill="#d1242f">при вмиканні — калібрування.</text>
+<text x="415" y="550" font-size="11" text-anchor="middle" fill="#8250df" font-weight="bold">GPIO17 TX → GPIO18 RX</text>
+<text x="415" y="566" font-size="11" text-anchor="middle" fill="#8250df" font-weight="bold">GPIO16 RX ← GPIO17 TX</text>
+<text x="415" y="582" font-size="11" text-anchor="middle" fill="#57606a" font-weight="bold">спільний GND обов'язковий</text>
+<line x1="40" y1="660" x2="70" y2="660" stroke="#d1242f" stroke-width="3"/>
+<text x="78" y="664" font-size="11.5" text-anchor="start" fill="#1f2328">3V3</text>
+<line x1="40" y1="678" x2="70" y2="678" stroke="#57606a" stroke-width="3"/>
+<text x="78" y="682" font-size="11.5" text-anchor="start" fill="#1f2328">GND</text>
+<line x1="40" y1="696" x2="70" y2="696" stroke="#0969da" stroke-width="3"/>
+<text x="78" y="700" font-size="11.5" text-anchor="start" fill="#1f2328">I2C SDA</text>
+<line x1="40" y1="714" x2="70" y2="714" stroke="#1a7f37" stroke-width="3"/>
+<text x="78" y="718" font-size="11.5" text-anchor="start" fill="#1f2328">I2C SCL</text>
+<line x1="40" y1="732" x2="70" y2="732" stroke="#8250df" stroke-width="3"/>
+<text x="78" y="736" font-size="11.5" text-anchor="start" fill="#1f2328">UART</text>
+<line x1="40" y1="750" x2="70" y2="750" stroke="#bc4c00" stroke-width="3"/>
+<text x="78" y="754" font-size="11.5" text-anchor="start" fill="#1f2328">сигнал</text>
+</svg>

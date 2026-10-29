@@ -1,16 +1,26 @@
-
-
+# ESP32-S3 N16R8: 16 МБ flash (quad), 8 МБ octal PSRAM.
+# Якщо у вас інша плата, закоментуйте блок SPIRAM / FLASHSIZE.
 CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_MODE_OCT=y
 CONFIG_SPIRAM_SPEED_80M=y
 
-
+# LVGL 8: порядок байтів кольору для ST7789 і потрібні шрифти
 CONFIG_LV_COLOR_16_SWAP=y
 CONFIG_LV_FONT_MONTSERRAT_10=y
 CONFIG_LV_FONT_MONTSERRAT_12=y
 CONFIG_LV_FONT_MONTSERRAT_14=y
 CONFIG_LV_FONT_MONTSERRAT_28=y
 
+# Wi-Fi, TLS і Open-Meteo тепер на майстрі (ESP32 DevKit): тут радіо не використовується
 
-CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y
+# FATFS: довгі імена файлів (weather_log.csv, 194512_pir.jpg). Без цього fopen на SD повертає помилку.
+CONFIG_FATFS_LFN_HEAP=y
+CONFIG_FATFS_MAX_LFN=64
+
+# Великі буфери (кадр, JPEG) беруться з PSRAM, малі - з внутрішньої RAM
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384
+
+# OV7670 у драйвері esp32-camera
+CONFIG_OV7670_SUPPORT=y
